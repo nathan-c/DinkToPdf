@@ -1,24 +1,21 @@
-﻿using DinkToPdf.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using DinkToPdf.Contracts;
 
 namespace DinkToPdf
 {
     public sealed class PdfTools : ITools
     {
-        public bool IsLoaded { get; private set; }
-
         public PdfTools()
         {
             IsLoaded = false;
         }
-        
-        public void Load() {
 
+        public bool IsLoaded { get; private set; }
+
+        public void Load()
+        {
             if (IsLoaded)
             {
                 return;
@@ -53,9 +50,9 @@ namespace DinkToPdf
         public unsafe string GetGlobalSetting(IntPtr settings, string name)
         {
             //default const char * size is 2048 bytes 
-            byte[] buffer = new byte[2048];
+            var buffer = new byte[2048];
 
-            fixed (byte* tempBuffer = buffer  )
+            fixed (byte* tempBuffer = buffer)
             {
                 WkHtmlToXBindings.wkhtmltopdf_get_global_setting(settings, name, tempBuffer, buffer.Length);
             }
@@ -81,7 +78,7 @@ namespace DinkToPdf
         public unsafe string GetObjectSetting(IntPtr settings, string name)
         {
             //default const char * size is 2048 bytes 
-            byte[] buffer = new byte[2048];
+            var buffer = new byte[2048];
 
             fixed (byte* tempBuffer = buffer)
             {
@@ -118,14 +115,14 @@ namespace DinkToPdf
 
         public void DestroyConverter(IntPtr converter)
         {
-             WkHtmlToXBindings.wkhtmltopdf_destroy_converter(converter);
+            WkHtmlToXBindings.wkhtmltopdf_destroy_converter(converter);
         }
 
         public byte[] GetConversionResult(IntPtr converter)
         {
             IntPtr resultPointer;
 
-            int length = WkHtmlToXBindings.wkhtmltopdf_get_output(converter, out resultPointer);
+            var length = WkHtmlToXBindings.wkhtmltopdf_get_output(converter, out resultPointer);
             var result = new byte[length];
             Marshal.Copy(resultPointer, result, 0, length);
 
@@ -177,11 +174,27 @@ namespace DinkToPdf
             return Marshal.PtrToStringAnsi(WkHtmlToXBindings.wkhtmltopdf_progress_string(converter));
         }
 
+        private string GetString(byte[] buffer)
+        {
+            var value = "";
+
+            var walk = 0;
+
+            while (walk < buffer.Length && buffer[walk] != 0)
+            {
+                walk++;
+            }
+
+            value = Encoding.UTF8.GetString(buffer, 0, walk);
+
+            return value;
+        }
+
         #region IDisposable Support
 
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue; // To detect redundant calls
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
@@ -215,21 +228,5 @@ namespace DinkToPdf
         }
 
         #endregion
-
-        private string GetString(byte[] buffer)
-        {
-            string value = "";
-
-            int walk = 0;
-
-            while (walk < buffer.Length && buffer[walk] != 0)
-            {
-                walk++;
-            }
-
-            value = Encoding.UTF8.GetString(buffer, 0, walk);
-
-            return value;
-        }
     }
 }

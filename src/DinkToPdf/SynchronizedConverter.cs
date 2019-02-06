@@ -1,25 +1,21 @@
-﻿using DinkToPdf.Contracts;
-using System;
-using System.Threading;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using DinkToPdf.Contracts;
 
 namespace DinkToPdf
 {
     public class SynchronizedConverter : BasicConverter
     {
-        Thread conversionThread;
-
-        BlockingCollection<Task> conversions = new BlockingCollection<Task>();
-
-        bool kill = false;
-
+        private readonly BlockingCollection<Task> conversions = new BlockingCollection<Task>();
         private readonly object startLock = new object();
+        private Thread conversionThread;
+
+        private bool kill;
 
         public SynchronizedConverter(ITools tools) : base(tools)
         {
-
         }
 
         public override byte[] Convert(IDocument document)
@@ -31,7 +27,7 @@ namespace DinkToPdf
         {
             StartThread();
 
-            Task<TResult> task = new Task<TResult>(@delegate);
+            var task = new Task<TResult>(@delegate);
 
             lock (task)
             {
@@ -69,7 +65,7 @@ namespace DinkToPdf
                 }
             }
         }
-        
+
         private void StopThread()
         {
             lock (startLock)
@@ -79,7 +75,8 @@ namespace DinkToPdf
                     kill = true;
 
                     while (conversionThread.ThreadState == ThreadState.Stopped)
-                    { }
+                    {
+                    }
 
                     conversionThread = null;
                 }
@@ -91,7 +88,7 @@ namespace DinkToPdf
             while (!kill)
             {
                 //get next conversion taks from blocking collection
-                Task task = conversions.Take();
+                var task = conversions.Take();
 
                 lock (task)
                 {

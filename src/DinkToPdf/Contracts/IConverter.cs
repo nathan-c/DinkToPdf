@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DinkToPdf.EventDefinitions;
 
 namespace DinkToPdf.Contracts
 {
     public interface IConverter
     {
-
         /// <summary>
-        ///  Converts document based on given settings
+        ///     Converts document based on given settings
         /// </summary>
         /// <param name="document">Document to convert</param>
         /// <returns>Returns converted document in bytes</returns>
@@ -25,6 +21,5 @@ namespace DinkToPdf.Contracts
         event EventHandler<ErrorArgs> Error;
 
         event EventHandler<WarningArgs> Warning;
-
     }
 }
