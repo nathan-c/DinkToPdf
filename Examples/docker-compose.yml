@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  dinktopdf.testconsoleapp:
+    image: ${DOCKER_REGISTRY-}dinktopdftestconsoleapp
+    build:
+      context: .
+      dockerfile: DinkToPdf.TestConsoleApp/Dockerfile

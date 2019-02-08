@@ -1,28 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DinkToPdf.Contracts
 {
     public interface ITools : IDisposable
     {
         /// <summary>
-        /// Load library and initialize wkhtmltopdf 
-        /// </summary>
-        void Load();
-
-        /// <summary>
-        /// Is set to true if library is loaded and wkhtmltopdf is initialized successfully
+        ///     Is set to true if library is loaded and wkhtmltopdf is initialized successfully
         /// </summary>
         bool IsLoaded { get; }
+
+        /// <summary>
+        ///     Load library and initialize wkhtmltopdf
+        /// </summary>
+        void Load();
 
         bool ExtendedQt();
 
         string GetLibraryVersion();
 
         /// <summary>
-        /// 
         /// </summary>
         /// <returns></returns>
         IntPtr CreateGlobalSettings();

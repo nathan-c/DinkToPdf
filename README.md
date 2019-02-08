@@ -1,15 +1,13 @@
 # DinkToPdf
-.NET Core P/Invoke wrapper for wkhtmltopdf library that uses Webkit engine to convert HTML pages to PDF.
+.NET Core P/Invoke wrapper for wkhtmltopdf library that uses Webkit engine to convert HTML pages to PDF. It is .NET Standard 2.0 and includes wkhtmltopdf binaries for x86/x64 platforms on Windows/Linux/macOS.
 
 ### Install 
 
-Library can be installed through Nuget. Run command bellow from the package manager console:
+Library can be installed through Nuget. The NuGet package includes native wkhtmltopdf binaries. Run command bellow from the package manager console:
 
 ```
 PM> Install-Package DinkToPdf
 ```
-
-Copy native library to root folder of your project. From there .NET Core loads native library when native method is called with P/Invoke. You can find latest version of native library [here](https://github.com/rdvojmoc/DinkToPdf/tree/master/v0.12.4). Select appropriate library for your OS and platform (64 or 32 bit).
 
 ### IMPORTANT
 Library was NOT tested with IIS. Library was tested in console applications and with Kestrel web server both for Web Application and Web API . 
@@ -91,3 +89,16 @@ public void ConfigureServices(IServiceCollection services)
     services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 }
 ```
+
+### Docker support
+On Linux the libgdiplus library must be installed in your container. There is an example Dockerfile in the DinkToPdf.TestConsoleApp project.
+
+### Building
+Build and run Dockerfile in root container to produce a NuGet package in packages-local
+```
+docker build -t dinktopdfbuild -f windows.dockerfile .
+docker run --rm -v E:/git/DinkToPdf/nathan-c/packages-local:C:/src/packages-local dinktopdfbuild
+```
+
+### Updating wkhtmltopdf binaries
+Pull the latest binaries from https://wkhtmltopdf.org/downloads.html. On windows take the MXE toolchain bins. The MSVC ones were giving me trouble at runtime. As of v.0.12.5 the linux binaries are not portable. Currently we only pull Ubuntu bins and put them in a correctly labelled runtime directory. In future we may want to create multiple runtime nupkg's, one for each runtime and let user decide what to import.

@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using DinkToPdf.Contracts;
 using DinkToPdf.EventDefinitions;
-using System.Globalization;
 
 namespace DinkToPdf
 {
     public class BasicConverter : IConverter
     {
         public readonly ITools Tools;
+
+        public BasicConverter(ITools tools)
+        {
+            Tools = tools;
+        }
 
         public IDocument ProcessingDocument { get; private set; }
 
@@ -25,23 +29,20 @@ namespace DinkToPdf
 
         public event EventHandler<WarningArgs> Warning;
 
-        public BasicConverter(ITools tools) {
-            Tools = tools;
-        }
-
         public virtual byte[] Convert(IDocument document)
         {
             if (document.GetObjects().Count() == 0)
             {
-                throw new ArgumentException("No objects is defined in document that was passed. At least one object must be defined.");
+                throw new ArgumentException(
+                    "No objects is defined in document that was passed. At least one object must be defined.");
             }
 
             ProcessingDocument = document;
-            
-            byte[] result = new byte[0];
+
+            var result = new byte[0];
             Tools.Load();
 
-            IntPtr converter = CreateConverter(document);
+            var converter = CreateConverter(document);
 
             //register events
             Tools.SetPhaseChangedCallback(converter, OnPhaseChanged);
@@ -50,7 +51,7 @@ namespace DinkToPdf
             Tools.SetWarningCallback(converter, OnWarning);
             Tools.SetErrorCallback(converter, OnError);
 
-            bool converted = Tools.DoConversion(converter);
+            var converted = Tools.DoConversion(converter);
 
             if (converted)
             {
@@ -64,8 +65,8 @@ namespace DinkToPdf
 
         private void OnPhaseChanged(IntPtr converter)
         {
-            int currentPhase = Tools.GetCurrentPhase(converter);
-            var eventArgs = new PhaseChangedArgs()
+            var currentPhase = Tools.GetCurrentPhase(converter);
+            var eventArgs = new PhaseChangedArgs
             {
                 Document = ProcessingDocument,
                 PhaseCount = Tools.GetPhaseCount(converter),
@@ -78,7 +79,7 @@ namespace DinkToPdf
 
         private void OnProgressChanged(IntPtr converter)
         {
-            var eventArgs = new ProgressChangedArgs()
+            var eventArgs = new ProgressChangedArgs
             {
                 Document = ProcessingDocument,
                 Description = Tools.GetProgressString(converter)
@@ -89,7 +90,7 @@ namespace DinkToPdf
 
         private void OnFinished(IntPtr converter, int success)
         {
-            var eventArgs = new FinishedArgs()
+            var eventArgs = new FinishedArgs
             {
                 Document = ProcessingDocument,
                 Success = success == 1 ? true : false
@@ -100,7 +101,7 @@ namespace DinkToPdf
 
         private void OnError(IntPtr converter, string message)
         {
-            var eventArgs = new ErrorArgs()
+            var eventArgs = new ErrorArgs
             {
                 Document = ProcessingDocument,
                 Message = message
@@ -111,7 +112,7 @@ namespace DinkToPdf
 
         private void OnWarning(IntPtr converter, string message)
         {
-            var eventArgs = new WarningArgs()
+            var eventArgs = new WarningArgs
             {
                 Document = ProcessingDocument,
                 Message = message
@@ -120,35 +121,35 @@ namespace DinkToPdf
             Warning?.Invoke(this, eventArgs);
         }
 
-        private IntPtr CreateConverter(IDocument document) {
-
-            IntPtr converter = IntPtr.Zero;
+        private IntPtr CreateConverter(IDocument document)
+        {
+            var converter = IntPtr.Zero;
 
             {
-                IntPtr settings = Tools.CreateGlobalSettings();
-                
+                var settings = Tools.CreateGlobalSettings();
+
                 ApplyConfig(settings, document, true);
 
                 converter = Tools.CreateConverter(settings);
             }
-            
+
             foreach (var obj in document.GetObjects())
             {
                 if (obj != null)
                 {
-                    IntPtr settings = Tools.CreateObjectSettings();
+                    var settings = Tools.CreateObjectSettings();
 
                     ApplyConfig(settings, obj, false);
 
                     Tools.AddObject(converter, settings, obj.GetContent());
                 }
             }
-            
+
             return converter;
         }
 
-        private void ApplyConfig(IntPtr config, ISettings settings, bool isGlobal) {
-
+        private void ApplyConfig(IntPtr config, ISettings settings, bool isGlobal)
+        {
             if (settings == null)
             {
                 return;
@@ -160,12 +161,11 @@ namespace DinkToPdf
 
             foreach (var prop in props)
             {
-                Attribute[] attrs = (Attribute[])prop.GetCustomAttributes();
-                object propValue = prop.GetValue(settings);
+                var attrs = (Attribute[]) prop.GetCustomAttributes();
+                var propValue = prop.GetValue(settings);
 
                 if (propValue == null)
                 {
-                    continue;
                 }
                 else if (attrs.Length > 0 && attrs[0] is WkHtmlAttribute)
                 {
@@ -177,7 +177,6 @@ namespace DinkToPdf
                 {
                     ApplyConfig(config, propValue as ISettings, isGlobal);
                 }
-
             }
         }
 
@@ -197,16 +196,16 @@ namespace DinkToPdf
 
             if (typeof(bool) == type)
             {
-                applySetting(config, name, ((bool)value == true ? "true" : "false"));
+                applySetting(config, name, (bool) value ? "true" : "false");
             }
             else if (typeof(double) == type)
             {
-                applySetting(config, name, ((double)value).ToString("0.##", CultureInfo.InvariantCulture));
+                applySetting(config, name, ((double) value).ToString("0.##", CultureInfo.InvariantCulture));
             }
             else if (typeof(Dictionary<string, string>).IsAssignableFrom(type))
             {
-                var dictionary = (Dictionary<string, string>)value;
-                int index = 0;
+                var dictionary = (Dictionary<string, string>) value;
+                var index = 0;
 
                 foreach (var pair in dictionary)
                 {
@@ -226,7 +225,6 @@ namespace DinkToPdf
             {
                 applySetting(config, name, value.ToString());
             }
-            
         }
     }
 }

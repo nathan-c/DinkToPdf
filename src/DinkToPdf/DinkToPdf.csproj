@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <VersionPrefix>2.0.1</VersionPrefix>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <!--NuGet -->
+  <PropertyGroup>
+    <PackageId>DinkToPdf</PackageId>
+    <Description>.NET Core P/Invoke wrapper for wkhtmltopdf library that uses Webkit engine to convert HTML pages to PDF.</Description>
+    <Copyright>Copyright 2017</Copyright>
+    <Authors>Rok Dvojmoč</Authors>
+    <PackageProjectUrl>https://github.com/rdvojmoc/DinkToPdf</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rdvojmoc/DinkToPdf</RepositoryUrl>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <IncludeSymbols>true</IncludeSymbols>
+    <PackageTags>wkhtmltopdf;netstandard;html;pdf;wrapper</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="..\..\v0.12.5\32 bit\libwkhtmltox.dll" Link="x86\libwkhtmltox.dll">
+      <Pack>true</Pack>
+      <PackagePath>build\net472\x86</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\64 bit\libwkhtmltox.dll" Link="x64\libwkhtmltox.dll">
+      <Pack>true</Pack>
+      <PackagePath>build\net472\x64</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DinkToPdf.targets">
+      <Pack>true</Pack>
+      <PackagePath>build\net472</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\32 bit\libwkhtmltox.dll" Link="runtimes\win7-x86\native\libwkhtmltox.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\win7-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\32 bit\libwkhtmltox.dylib" Link="runtimes\osx-x86\native\libwkhtmltox.dylib">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\osx-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\32 bit\libwkhtmltox.so" Link="runtimes\ubuntu-x86\native\libwkhtmltox.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\ubuntu-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\64 bit\libwkhtmltox.dll" Link="runtimes\win7-x64\native\libwkhtmltox.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\win7-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\64 bit\libwkhtmltox.dylib" Link="runtimes\osx-x64\native\libwkhtmltox.dylib">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\osx-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\v0.12.5\64 bit\libwkhtmltox.so" Link="runtimes\ubuntu-x64\native\libwkhtmltox.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\ubuntu-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
+    <PackageReference Include="System.Globalization" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>
