@@ -11,10 +11,22 @@ namespace DinkToPdf
     public class BasicConverter : IConverter
     {
         public readonly ITools Tools;
+        private readonly VoidCallback _onPhaseChangedDelegate;
+        private readonly VoidCallback _onProgressChangedDelegate;
+        private readonly IntCallback _onFinishedDelegate;
+        private readonly StringCallback _onWarningDelegate;
+        private readonly StringCallback _onErrorDelegate;
 
         public BasicConverter(ITools tools)
         {
             Tools = tools;
+
+            // This is needed to make sure callbacks are not garbage collected
+            _onPhaseChangedDelegate = new VoidCallback(OnPhaseChanged);
+            _onProgressChangedDelegate = new VoidCallback(OnProgressChanged);
+            _onFinishedDelegate = new IntCallback(OnFinished);
+            _onWarningDelegate = new StringCallback(OnWarning);
+            _onErrorDelegate = new StringCallback(OnError);
         }
 
         public IDocument ProcessingDocument { get; private set; }
@@ -31,36 +43,43 @@ namespace DinkToPdf
 
         public virtual byte[] Convert(IDocument document)
         {
-            if (document.GetObjects().Count() == 0)
+            try
             {
-                throw new ArgumentException(
-                    "No objects is defined in document that was passed. At least one object must be defined.");
+                if (!document.GetObjects().Any())
+                {
+                    throw new ArgumentException(
+                        "No objects is defined in document that was passed. At least one object must be defined.");
+                }
+
+                ProcessingDocument = document;
+
+                var result = new byte[0];
+                Tools.Load();
+
+                var converter = CreateConverter(document);
+
+                //register events
+                Tools.SetPhaseChangedCallback(converter, _onPhaseChangedDelegate);
+                Tools.SetProgressChangedCallback(converter, _onProgressChangedDelegate);
+                Tools.SetFinishedCallback(converter, _onFinishedDelegate);
+                Tools.SetWarningCallback(converter, _onWarningDelegate);
+                Tools.SetErrorCallback(converter, _onErrorDelegate);
+
+                var converted = Tools.DoConversion(converter);
+
+                if (converted)
+                {
+                    result = Tools.GetConversionResult(converter);
+                }
+
+                Tools.DestroyConverter(converter);
+                
+                return result;
             }
-
-            ProcessingDocument = document;
-
-            var result = new byte[0];
-            Tools.Load();
-
-            var converter = CreateConverter(document);
-
-            //register events
-            Tools.SetPhaseChangedCallback(converter, OnPhaseChanged);
-            Tools.SetProgressChangedCallback(converter, OnProgressChanged);
-            Tools.SetFinishedCallback(converter, OnFinished);
-            Tools.SetWarningCallback(converter, OnWarning);
-            Tools.SetErrorCallback(converter, OnError);
-
-            var converted = Tools.DoConversion(converter);
-
-            if (converted)
+            finally
             {
-                result = Tools.GetConversionResult(converter);
+                ProcessingDocument = null;
             }
-
-            Tools.DestroyConverter(converter);
-
-            return result;
         }
 
         private void OnPhaseChanged(IntPtr converter)
