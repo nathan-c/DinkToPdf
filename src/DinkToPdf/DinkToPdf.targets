@@ -1,122 +1,13 @@
-<!--
- *
- * DinkToPdf.targets -
- *
- * WARNING: This MSBuild file requires MSBuild 4.0 features.
- *
- * Heavily influenced by Joe Mistachkin and David Archer from System.Data.Sqlite.
- * Released to the public domain, use at your own risk!
- *
--->
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-    <!--
-  ******************************************************************************
-  **                    libwkhtmltopdf Library Build Items                    **
-  ******************************************************************************
-  -->
-
-    <ItemGroup>
-        <LibwkhtmltopdfFiles Condition="'$(MSBuildThisFileDirectory)' != '' And
-                                   HasTrailingSlash('$(MSBuildThisFileDirectory)')" 
-                                   Include="$(MSBuildThisFileDirectory)**\libwkhtmltox.*" />
-    </ItemGroup>
-
-    <!--
-  ******************************************************************************
-  **                   libwkhtmltopdf Library Content Items                   **
-  ******************************************************************************
-  -->
-
-    <ItemGroup Condition="'$(ContentLibwkhtmltopdfFiles)' != '' And
-                        '$(ContentLibwkhtmltopdfFiles)' != 'false' And
-                        '@(LibwkhtmltopdfFiles)' != ''">
-        <Content Include="@(LibwkhtmltopdfFiles)">
-            <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <!--
-  ******************************************************************************
-  **                   libwkhtmltopdf Library Build Targets                   **
-  ******************************************************************************
-  -->
-
-    <Target Name="CopyLibwkhtmltopdfFiles" Condition="'$(CopyLibwkhtmltopdfFiles)' != 'false' And
-                     '$(OutDir)' != '' And
-                     HasTrailingSlash('$(OutDir)') And
-                     Exists('$(OutDir)')" Inputs="@(LibwkhtmltopdfFiles)" Outputs="@(LibwkhtmltopdfFiles -> '$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')">
-        <!--
-        NOTE: Copy "libwkhtmltox.dll" and all related files, for every
-              architecture that we support, to the build output directory.
-    -->
-        <Copy SourceFiles="@(LibwkhtmltopdfFiles)" DestinationFiles="@(LibwkhtmltopdfFiles -> '$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')" />
-    </Target>
-
-    <!--
-  ******************************************************************************
-  -->
-
-    <Target Name="CleanLibwkhtmltopdfFiles" Condition="'$(CleanLibwkhtmltopdfFiles)' != 'false' And
-                     '$(OutDir)' != '' And
-                     HasTrailingSlash('$(OutDir)') And
-                     Exists('$(OutDir)')">
-        <!--
-        NOTE: Delete "libwkhtmltox.dll" and all related files, for every
-              architecture that we support, from the build output directory.
-    -->
-        <Delete Files="@(LibwkhtmltopdfFiles -> '$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')" />
-    </Target>
-
-    <!--
-  ******************************************************************************
-  -->
-
-    <Target Name="CollectLibwkhtmltopdfFiles" Condition="'$(CollectLibwkhtmltopdfFiles)' != 'false'">
-        <ItemGroup>
-            <FilesForPackagingFromProject Include="@(LibwkhtmltopdfFiles)">
-                <DestinationRelativePath>bin\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
-            </FilesForPackagingFromProject>
-        </ItemGroup>
-    </Target>
-
-    <!--
-  ******************************************************************************
-  **                 libwkhtmltopdf Library Build Properties                  **
-  ******************************************************************************
-  -->
-
-    <PropertyGroup>
-        <PostBuildEventDependsOn>
-      $(PostBuildEventDependsOn);
-      CopyLibwkhtmltopdfFiles;
-        </PostBuildEventDependsOn>
-        <BuildDependsOn>
-      $(BuildDependsOn);
-      CopyLibwkhtmltopdfFiles;
-        </BuildDependsOn>
-        <CleanDependsOn>
-      $(CleanDependsOn);
-      CleanLibwkhtmltopdfFiles;
-        </CleanDependsOn>
-    </PropertyGroup>
-
-    <!--
-  ******************************************************************************
-  **     libwkhtmltopdf Library Publish Properties for Visual Studio 201x     **
-  ******************************************************************************
-  -->
-
-    <PropertyGroup Condition="'$(VisualStudioVersion)' == '' Or
-                            '$(VisualStudioVersion)' == '10.0' Or
-                            '$(VisualStudioVersion)' == '11.0' Or
-                            '$(VisualStudioVersion)' == '12.0' Or
-                            '$(VisualStudioVersion)' == '14.0' Or
-                            '$(VisualStudioVersion)' == '15.0'">
-        <PipelineCollectFilesPhaseDependsOn>
-      CollectLibwkhtmltopdfFiles;
-      $(PipelineCollectFilesPhaseDependsOn);
-        </PipelineCollectFilesPhaseDependsOn>
-    </PropertyGroup>
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)x86\libwkhtmltox.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>x86\libwkhtmltox.dll</Link>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)x64\libwkhtmltox.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>x64\libwkhtmltox.dll</Link>
+    </None>
+  </ItemGroup>
 </Project>
