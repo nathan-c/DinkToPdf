@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:sdk-bionic as base
+FROM microsoft/dotnet:2.2-sdk-bionic as base
 
 WORKDIR /src
 
