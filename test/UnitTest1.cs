@@ -1,5 +1,6 @@
 using DinkToPdf;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Xunit;
 
@@ -59,7 +60,9 @@ namespace test
             Assert.Equal(0, warningCount);
             Assert.Equal(1, finishedCount);
 
-            byte[] expected = File.ReadAllBytes("expected.pdf");
+            var os = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
+
+            byte[] expected = File.ReadAllBytes($"expected.{os}.pdf");
             Assert.Equal(expected, pdf);
         }
     }
